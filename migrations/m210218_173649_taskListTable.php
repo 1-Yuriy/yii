@@ -19,6 +19,12 @@ class m210218_173649_taskListTable extends Migration
             'create_date' => $this->timestamp(),
             'is_done' => $this->boolean()->defaultValue(0),
         ]);
+
+        $this->createIndex(
+            'idx-task_list-title',
+            'task_list',
+            'title'
+        );
     }
 
     /**
