@@ -1,10 +1,9 @@
 <?php
 
 use yii\helpers\Html;
-use yii\grid\GridView;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
-/* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Tasks';
 $this->params['breadcrumbs'][] = $this->title;
@@ -17,31 +16,29 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= Html::a('Create Task', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+    <p>
+        <?= Html::textInput('search', null, [
+            'class' => 'form-control task-search',
+            'placeholder' => 'Search by title...'
+        ]) ?>
+    </p>
 
-            'id',
-            'title',
-            'description:ntext',
-            'create_date',
-            'is_done',
-
-            ['class' => 'yii\grid\ActionColumn', 'template'=>'{view} {update} {delete} {complete}',
-                'buttons'=>[
-                    'complete' => function ($url, $model) {
-                        return $model->is_done === 0
-                            ? Html::a(
-                                 '<span class="glyphicon glyphicon-ok"></span>',
-                                 $url,
-                                 ['title' => Yii::t('yii', 'Mark as complete')]
-                            )
-                            : false;
-                    },
-                ],
-            ],
-        ],
-    ]); ?>
-
+    <div id="task-list">
+        <?= $this->context->actionList() ?>
+    </div>
 </div>
+
+<?php
+$ajaxUrl = Url::toRoute('list');
+
+$this->registerJs(<<<JS
+    $('.task-search').on('keyup', function () {
+        let search = $(this).val();
+
+        $.get('$ajaxUrl', {search: search}, function(data) {
+            $('#task-list').html(data);
+        });
+    });
+JS
+);
+?>

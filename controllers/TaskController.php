@@ -33,16 +33,31 @@ class TaskController extends Controller
     }
 
     /**
-     * Lists all Task models.
      * @return mixed
      */
     public function actionIndex()
     {
+        return $this->render('index');
+    }
+
+    /**
+     * Lists Task models
+     * @param null|string $search
+     * @return mixed
+     */
+    public function actionList($search = null)
+    {
+        $query = Task::find();
+
+        if (!is_null($search)) {
+            $query->andWhere(['like', 'title', $search]);
+        }
+
         $dataProvider = new ActiveDataProvider([
-            'query' => Task::find(),
+            'query' => $query,
         ]);
 
-        return $this->render('index', [
+        return $this->renderAjax('list', [
             'dataProvider' => $dataProvider,
         ]);
     }
